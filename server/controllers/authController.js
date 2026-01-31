@@ -85,3 +85,121 @@ export const logout = async (req, res) => {
     return res.json({ success: false, message: error.message });
   }
 };
+
+export const sendVerifyOTP = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const user = await User.findById(userId);
+    if (user.isAccountVerified) {
+      return res.json({ success: false, message: "Account Already Verified!" });
+    }
+    const otp = String(Math.floor(100000 + Math.random() * 900000));
+    user.verifyOTP = otp;
+    user.verifyOTPExpiresAt = Date.now() + 24 * 60 * 60 * 1000;
+    await user.save();
+    const mailOptions = {
+      from: `GreatStack ${process.env.SMTP_EMAIL}`,
+      to: user.email,
+      subject: `Account Verification OTP`,
+      text: `Your OTP is ${otp}.Verify your account using this OTP. `,
+    };
+    await transporter.sendMail(mailOptions);
+    res.json({ success: true, message: "Verification OTP send on email." });
+  } catch (error) {
+    return res.json({ success: false, message: error.message });
+  }
+};
+
+export const verifyEmail = async (req, res) => {
+  const { userId, otp } = req.body;
+  if (!userId || !otp) {
+    return res.json({ success: false, message: "Missing Details!" });
+  }
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.json({ success: false, message: "User Not Found!" });
+    }
+    if (user.verifyOTP == "" || user.verifyOTP !== otp) {
+      return res.json({ success: false, message: "Invalid OTP" });
+    }
+    if (user.verifyOTPExpiresAt < Date.now()) {
+      return res.json({ success: false, message: "OTP Expired!" });
+    }
+    user.isAccountVerified = true;
+    user.verifyOTP = "";
+    user.verifyOTPExpiresAt = 0;
+    await user.save();
+    return res.json({ success: true, message: "Email Verified Successfully!" });
+  } catch (error) {
+    return res.json({ success: false, message: error.message });
+  }
+};
+
+export const isAuthenticated = async (req, res) => {
+  try {
+    return res.json({ success: true });
+  } catch (error) {
+    return res.json({ success: false, message: error.message });
+  }
+};
+
+export const sendResetOTP = async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    return res.json({ success: false, message: "Email Is Required!" });
+  }
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.json({ success: false, message: "User Not Found!" });
+    }
+    const otp = String(Math.floor(100000 + Math.random() * 900000));
+    user.resetOTP = otp;
+    user.resetOTPExpiresAt = Date.now() + 15 * 60 * 1000;
+    await user.save();
+    const mailOptions = {
+      from: `GreatStack ${process.env.SMTP_EMAIL}`,
+      to: user.email,
+      subject: `Password Reset Password`,
+      text: `Your OTP for resetting your password is ${otp}.Use this OTP to proceed with resetting your password `,
+    };
+    await transporter.sendMail(mailOptions);
+    res.json({ success: true, message: "OTP send to your email." });
+  } catch (error) {
+    return res.json({ success: false, message: error.message });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  const { email, otp, newPassword } = req.body;
+  if (!email || !otp || !newPassword) {
+    return res.json({
+      success: false,
+      message: "Email, OTP & New Passpord are required!",
+    });
+  }
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.json({ success: false, message: "User Not Found!" });
+    }
+    if (user.resetOTP === "" || user.resetOTP !== otp) {
+      return res.json({ success: false, message: "Invalid OTP" });
+    }
+    if (user.resetOTPExpiresAt < Date.now()) {
+      return res.json({ success: false, message: "OTP Expired!" });
+    }
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    user.resetOTP = "";
+    user.resetOTPExpiresAt = 0;
+    await user.save();
+    return res.json({
+      success: true,
+      message: "Password has been successfully reset!",
+    });
+  } catch (error) {
+    return register.json({ success: false, message: error.message });
+  }
+};
