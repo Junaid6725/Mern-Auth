@@ -11,9 +11,11 @@ dotenv.config();
 const PORT = process.env.PORT || 8000;
 connectDB();
 
+const allowOrigins = ["http://localhost:5173"];
+
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({ credentials: true }));
+app.use(cors({ origin: allowOrigins, credentials: true }));
 app.use(express.urlencoded({ extended: false }));
 
 app.get("/", (req, res) => {
