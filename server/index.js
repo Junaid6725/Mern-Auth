@@ -8,10 +8,10 @@ import userRoutes from "./routes/userRoutes.js";
 
 const app = express();
 dotenv.config();
-const PORT = process.env.PORT || 8000;
+// const PORT = process.env.PORT || 8000;
 connectDB();
 
-const allowOrigins = ["http://localhost:5173"];
+const allowOrigins = [process.env.FRONTEND_URL];
 
 app.use(express.json());
 app.use(cookieParser());
@@ -24,6 +24,8 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}:`);
-});
+// app.listen(PORT, () => {
+//   console.log(`Server is running on port ${PORT}:`);
+// });
+
+export default app;
