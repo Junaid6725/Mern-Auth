@@ -11,18 +11,15 @@ dotenv.config();
 // const PORT = process.env.PORT || 8000;
 connectDB();
 
-const allowOrigins = ["https://mern-auth-five-black.vercel.app"];
-
 app.use(express.json());
-app.use(cors({ origin: allowOrigins, credentials: true }));
-app.use(express.urlencoded({ extended: false }));
-app.options(
-  "*",
+app.use(
   cors({
-    origin: allowOrigins,
+    origin: "https://mern-auth-five-black.vercel.app",
     credentials: true,
   }),
 );
+app.use(express.urlencoded({ extended: false }));
+
 app.use(cookieParser());
 
 app.get("/", (req, res) => {
