@@ -14,7 +14,6 @@ connectDB();
 const allowOrigins = [process.env.FRONTEND_URL];
 
 app.use(express.json());
-app.use(cookieParser());
 app.use(cors({ origin: allowOrigins, credentials: true }));
 app.use(express.urlencoded({ extended: false }));
 app.options(
@@ -24,6 +23,7 @@ app.options(
     credentials: true,
   }),
 );
+app.use(cookieParser());
 
 app.get("/", (req, res) => {
   res.send("<h1>API Working</h1>");
