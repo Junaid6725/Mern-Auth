@@ -20,7 +20,7 @@ app.use(express.urlencoded({ extended: false }));
 app.options(
   "*",
   cors({
-    origin: allowOrigins,
+    origin: allowOrigins || "https://mern-auth-five-black.vercel.app",
     credentials: true,
   }),
 );
