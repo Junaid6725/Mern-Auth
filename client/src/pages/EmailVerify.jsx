@@ -39,10 +39,9 @@ const EmailVerify = () => {
       e.preventDefault();
       const otpArray = inputRef.current.map((e) => e.value);
       const otp = otpArray.join("");
-      const { data } = await axios.post(
-        backendURL + "/api/auth/verify-account",
-        { otp },
-      );
+      const { data } = await axios.post(backendURL + "/auth/verify-account", {
+        otp,
+      });
       if (data.success) {
         toast.success(data.message);
         getUserData();

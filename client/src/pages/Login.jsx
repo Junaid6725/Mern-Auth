@@ -18,7 +18,7 @@ const Login = () => {
       e.preventDefault();
       axios.defaults.withCredentials = true;
       if (state === "Sign Up") {
-        const { data } = await axios.post(backendURL + "/api/auth/register", {
+        const { data } = await axios.post(backendURL + "/auth/register", {
           name,
           email,
           password,
@@ -31,7 +31,7 @@ const Login = () => {
           toast.error(data.message);
         }
       } else {
-        const { data } = await axios.post(backendURL + "/api/auth/login", {
+        const { data } = await axios.post(backendURL + "/auth/login", {
           email,
           password,
         });
