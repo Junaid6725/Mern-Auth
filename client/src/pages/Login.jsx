@@ -11,11 +11,13 @@ const Login = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const onSubmitHandler = async (e) => {
     try {
       e.preventDefault();
+      isLoading(true);
       axios.defaults.withCredentials = true;
       if (state === "Sign Up") {
         const { data } = await axios.post(backendURL + "/auth/register", {
@@ -27,6 +29,7 @@ const Login = () => {
           setIsLoggedIn(true);
           getUserData();
           navigate("/");
+          isLoading(false);
         } else {
           toast.error(data.message);
         }
@@ -45,6 +48,7 @@ const Login = () => {
       }
     } catch (error) {
       toast.error(error.message);
+      isLoading(false);
     }
   };
   return (
@@ -109,8 +113,9 @@ const Login = () => {
             >
               Forgot Password?
             </p>
-            <button className="w-full py-2.5 rounded-full bg-linear-to-r from-indigo-500 to-indigo-900 hover:cursor-pointer text-white font-medium">
-              {state}
+            <button className="w-full py-2.5 rounded-full bg-linear-to-r from-indigo-500 to-indigo-900 hover:cursor-pointer text-white font-medium" disabled={isLoading}>
+              {isLoading? "Please wait..." : state}
+           
             </button>
           </form>
           {state === "Sign Up" ? (
