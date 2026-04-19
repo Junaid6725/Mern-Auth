@@ -6,8 +6,9 @@ import connectDB from "./config/mongoDB.js";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 
-const app = express();
 dotenv.config();
+const app = express();
+
 // const PORT = process.env.PORT || 8000;
 connectDB();
 
@@ -19,6 +20,7 @@ const corsOptions = {
 };
 console.log("FRONTEND_URL:", process.env.FRONTEND_URL);
 
+app.options("*", cors(corsOptions));
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
